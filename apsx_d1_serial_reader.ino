@@ -100,7 +100,12 @@ void loop()
      {
        theserial = mySerial2.read();
        
-       if ((calib_flag == true) && (theserial == 190)){ calib_flag == false;}
+       if ((calib_flag == true) && (theserial == 190))
+          {
+            calib_flag == false;
+            lcd.setCursor(0,2); //Start at character 0 on line 2
+            lcd.print("                  ");
+          }
        
        if ((theserial < 191) && (theserial > 89) || (calib_flag == true))
           {
@@ -120,12 +125,15 @@ void loop()
               lcd.setCursor(7,0); //Start at character 6 on line 0
               lcd.print(theserial);
             }
-          //  lcd.setCursor(8,0); //Start at character 8 on line 0
-          //  lcd.print(".");
-          //  byte tmp;
-          //  tmp == constrain(theserial, 0, 10);
-          //  if (tmp == 10 ){tmp == 0;}
-          //  lcd.print(tmp);
+            lcd.setCursor(8,0); //Start at character 8 on line 0
+            lcd.print(".");
+            int tmp1, tmp2;
+            //tmp1 = (theserial/10);
+            tmp1 = divu10(theserial);
+            //tmp2 = (tmp1*10);
+            tmp2 = mult10(tmp1);
+            
+            lcd.print((theserial-tmp2));
             
             Serial.print(theserial);
             Serial.print(" ");   
@@ -149,7 +157,7 @@ void loop()
      {
       int datain;
       datain = Serial.read();
-      softserial_command(datain);
+      //softserial_command(datain);
        //mySerial.write(datain);
        //Serial.print(datain);
      }
@@ -183,18 +191,38 @@ void decode_command(int cmd1)
                                            {
                                             case 1:
                                             Serial.print("fuel type LAMBDA ");
+                                            lcd.setCursor(0,1); //Start at character 0 on line 1
+                                            lcd.print("                  ");
+                                            lcd.setCursor(0,1); //Start at character 0 on line 1
+                                            lcd.print("fuel type LAMBDA");
                                             break;
                                             case 2:
                                             Serial.print("fuel type E85 ");
+                                            lcd.setCursor(0,1); //Start at character 0 on line 1
+                                            lcd.print("                  ");
+                                            lcd.setCursor(0,1); //Start at character 0 on line 1
+                                            lcd.print("fuel type E85");
                                             break;
                                             case 3:
-                                            Serial.print("fuel type GAS ");
+                                            Serial.print("fuel type PETROL / GAS ");
+                                            lcd.setCursor(0,1); //Start at character 0 on line 1
+                                            lcd.print("                  ");
+                                            lcd.setCursor(0,1); //Start at character 0 on line 1
+                                            lcd.print("fuel type PETROL");
                                             break;
                                             case 4:
                                             Serial.print("fuel type DIESEL ");
+                                            lcd.setCursor(0,1); //Start at character 0 on line 1
+                                            lcd.print("                  ");
+                                            lcd.setCursor(0,1); //Start at character 0 on line 1
+                                            lcd.print("fuel type DIESEL");
                                             break;
                                             case 5:
                                             Serial.print("fuel type METHANOL ");
+                                            lcd.setCursor(0,1); //Start at character 0 on line 1
+                                            lcd.print("                  ");
+                                            lcd.setCursor(0,1); //Start at character 0 on line 1
+                                            lcd.print("fuel type METHANOL");
                                             break;
                                            }  
                                   break;
@@ -257,27 +285,47 @@ void decode_command(int cmd1)
                             {                             
                               case 12:
                               //set NB low limit
-                               Serial.print(" SET NB LOW Limit "); 
+                               Serial.print(" SET NB LOW Limit ");                                
+                               lcd.setCursor(0,2); //Start at character 0 on line 2
+                               lcd.print("                  ");
+                               lcd.setCursor(0,2); //Start at character 0 on line 2
+                               lcd.print("SET NB LOW Limit");
                               break;
                               
                               case 13:
                               //set nb high limit
-                               Serial.print(" SET NB HIGH Limit "); 
+                               Serial.print(" SET NB HIGH Limit ");                                
+                               lcd.setCursor(0,2); //Start at character 0 on line 2
+                               lcd.print("                  ");
+                               lcd.setCursor(0,2); //Start at character 0 on line 2
+                               lcd.print("SET NB HIGH Limit");
                               break;
                               
                               case 14:
                               //set afr low limit
-                               Serial.print(" SET AFR LOW Limit "); 
+                               Serial.print(" SET AFR LOW Limit ");                                
+                               lcd.setCursor(0,2); //Start at character 0 on line 2
+                               lcd.print("                  ");
+                               lcd.setCursor(0,2); //Start at character 0 on line 2
+                               lcd.print("SET AFR LOW Limit");
                               break;
                               
                               case 15:
                               //set afr high limit
-                               Serial.print(" SET AFR HIGH Limit "); 
+                               Serial.print(" SET AFR HIGH Limit ");                                
+                               lcd.setCursor(0,2); //Start at character 0 on line 2
+                               lcd.print("                  ");
+                               lcd.setCursor(0,2); //Start at character 0 on line 2
+                               lcd.print("SET AFR HIGH Limit");
                               break;
                               
                               case 16:
                               // calibrate
-                               Serial.print(" CALIBRATE "); 
+                               Serial.print(" CALIBRATE ");                               
+                               lcd.setCursor(0,2); //Start at character 0 on line 2
+                               lcd.print("                  ");
+                               lcd.setCursor(0,2); //Start at character 0 on line 2
+                               lcd.print(" CALIBRATE"); 
                                calib_flag = true;
                               break;
                               
@@ -415,3 +463,23 @@ void softserial_command(int thedata)
           }
 
  }                    
+
+ unsigned divu10(unsigned n)  
+  {
+    unsigned q, r;
+    q = (n >> 1) + (n>> 2);
+    q = q + (q >> 4);
+    q = q + (q >> 8);
+    q = q + (q >> 16);
+    q = q >> 3;
+    r = n - (((q << 2) + q) << 1);
+    return q +(r > 9);
+  }
+
+unsigned mult10(unsigned n)
+  {
+    unsigned i;
+    i = (n << 3) + (n << 1);
+    return i;
+  }
+
